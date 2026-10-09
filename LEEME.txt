@@ -1,0 +1,58 @@
+AUDITOR ZONAHACK  -  app web para Vercel
+=========================================
+
+Que es
+------
+Una pagina donde pegas la URL de un sitio TUYO y una funcion Python
+(serverless, en Vercel) lo rastrea, analiza el HTML y los JS, prueba las
+politicas RLS de tu Supabase y te arma el SQL para cerrar las tablas
+abiertas. Funciona con URL porque el rastreo lo hace el servidor, no el
+navegador.
+
+Archivos
+--------
+  index.html       -> la pagina (frontend)
+  api/scan.py      -> la funcion serverless (el motor). Solo stdlib de Python.
+  vercel.json      -> deja la funcion correr hasta 60s
+  LEEME.txt        -> esto
+
+Como subirlo a Vercel (elegi UNA opcion)
+----------------------------------------
+
+OPCION A - Arrastrar y soltar (lo mas rapido)
+  1. Entra a  https://vercel.com/new
+  2. Comprimi esta carpeta en un .zip (o arrastra la carpeta entera).
+  3. Soltala en "Deploy". Deja el framework en "Other".
+  4. Deploy. En ~1 min te da la URL (ej: auditor-zonahack.vercel.app).
+
+OPCION B - Vercel CLI
+  1. Instala Node y luego:  npm i -g vercel
+  2. En esta carpeta:  vercel        (preview)
+     o para produccion:  vercel --prod
+  3. Logueate cuando lo pida y elegi un nombre de proyecto.
+
+OPCION C - GitHub
+  1. Subi esta carpeta a un repo nuevo en GitHub.
+  2. En https://vercel.com/new importa el repo. Framework: "Other".
+  3. Deploy. Cada push vuelve a desplegar solo.
+
+Como se usa
+-----------
+  - Abri la URL que te da Vercel.
+  - Pega la URL de tu sitio, elegi cuantas paginas y si probar escritura.
+  - Te muestra hallazgos por severidad, la prueba RLS en vivo y el SQL.
+
+Avisos
+------
+  - Usalo solo con paginas TUYAS.
+  - "Probar escritura" intenta insertar en tus tablas para ver cuales
+    estan abiertas; es no destructivo (borra lo que inserta).
+  - Nunca pongas la clave service_role en el campo de anon key.
+  - La funcion tiene 60s de limite; si un sitio es enorme, baja el numero
+    de paginas.
+
+Opcional: ponerle contrasena
+----------------------------
+  Como esta app audita, conviene que no quede abierta a cualquiera.
+  En Vercel: Project -> Settings -> Deployment Protection -> Vercel
+  Authentication (pide login de tu cuenta para entrar).

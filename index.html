@@ -1,0 +1,121 @@
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auditor ZonaHack</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#0e1116;--panel:#161b22;--panel2:#1d242e;--line:#2a323d;--fg:#e6ebf1;--muted:#8b97a5;
+--accent:#f0821e;--crit:#ff6b5e;--alto:#ffab52;--medio:#e5c558;--ok:#5ad08c;--code:#0a0d12;
+--ui:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui);line-height:1.5}
+.wrap{max-width:880px;margin:0 auto;padding:26px 16px}
+h1{font-family:var(--mono);font-size:1.5rem;margin:0}.dot{color:var(--accent)}
+p.lead{color:var(--muted);margin:.4rem 0 0;font-size:.9rem;max-width:64ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-top:18px}
+.bar{display:flex;gap:10px;flex-wrap:wrap}
+input[type=text]{flex:1;min-width:200px;background:var(--code);color:var(--fg);border:1px solid var(--line);
+border-radius:8px;font-family:var(--mono);font-size:.9rem;padding:11px 12px}
+input:focus{outline:2px solid var(--accent)}
+.opts{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px;font-size:.85rem;color:var(--muted)}
+.opts label{display:flex;gap:6px;align-items:center}.opts input[type=number]{width:60px}
+button{font-family:var(--ui);font-weight:600;border-radius:8px;border:1px solid var(--line);background:var(--panel2);
+color:var(--fg);padding:11px 18px;cursor:pointer}button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:#1a1205;border-color:var(--accent)}button:disabled{opacity:.5;cursor:default}
+.sevgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:520px){.sevgrid{grid-template-columns:repeat(2,1fr)}}
+.tile{border:1px solid var(--line);border-radius:9px;padding:12px;background:var(--panel2)}
+.tile .n{font-family:var(--mono);font-size:1.7rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.tile .l{font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-top:.3rem}
+.tile.crit .n{color:var(--crit)}.tile.alto .n{color:var(--alto)}.tile.medio .n{color:var(--medio)}.tile.info .n{color:var(--muted)}
+h2{font-size:1.05rem;margin:0 0 4px}h2 .s{font-weight:400;color:var(--muted);font-size:.85rem}
+ul.find{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:8px}
+ul.find li{border:1px solid var(--line);border-left-width:4px;border-radius:7px;padding:9px 12px;background:var(--panel2);font-size:.88rem;word-break:break-word}
+li.crit{border-left-color:var(--crit)}li.alto{border-left-color:var(--alto)}li.medio{border-left-color:var(--medio)}li.info{border-left-color:var(--muted)}
+.badge{font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;padding:1px 6px;border-radius:4px;margin-right:8px}
+.badge.crit{background:var(--crit);color:#1a0604}.badge.alto{background:var(--alto);color:#1a1205}.badge.medio{background:var(--medio);color:#1a1205}.badge.info{background:var(--muted);color:#0e1116}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);font-family:var(--mono)}
+th{color:var(--muted);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+.ab{color:var(--crit);font-weight:600}.pr{color:var(--ok)}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;font-family:var(--mono);font-size:.8rem;margin:12px 0 0;white-space:pre}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:10px;font-size:.85rem}.meta .k{color:var(--muted)}
+.meta div{word-break:break-all}
+.note{font-size:.8rem;color:var(--muted);border-top:1px dashed var(--line);margin-top:16px;padding-top:12px}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid var(--muted);border-top-color:var(--accent);
+border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;margin-right:8px}@keyframes s{to{transform:rotate(360deg)}}
+.err{color:var(--crit)}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-family:var(--mono);font-size:.78rem;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+</style></head><body><div class="wrap">
+<h1>Auditor<span class="dot">·</span>ZonaHack</h1>
+<p class="lead">Pega la URL de una pagina TUYA. El motor la rastrea, analiza el HTML y los JS, prueba las politicas RLS de Supabase y arma el SQL de cierre.</p>
+<div class="card"><div class="bar">
+<input type="text" id="url" placeholder="https://tusitio.com" autocomplete="off">
+<button class="primary" id="go">Auditar</button>
+</div><div class="opts">
+<label>Paginas <input type="number" id="max" value="8" min="1" max="25"></label>
+<label><input type="checkbox" id="write"> Probar escritura RLS (no destructiva)</label>
+<label>anon key <input type="text" id="key" placeholder="(opcional)" style="min-width:140px"></label>
+</div></div>
+<div id="status"></div>
+<div id="out"></div>
+<p class="note">Usalo solo con paginas tuyas. "Probar escritura" intenta insertar en tus tablas para ver cuales estan abiertas y borra lo que cree. Nunca pongas aca la clave service_role.</p>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const SEV={CRITICO:"crit",ALTO:"alto",MEDIO:"medio",INFO:"info"};
+function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+async function run(){
+  const url=$("#url").value.trim(); if(!url){$("#status").innerHTML='<p class="err">Pega una URL.</p>';return;}
+  $("#go").disabled=true; $("#out").innerHTML="";
+  $("#status").innerHTML='<div class="card"><span class="spin"></span>Auditando '+esc(url)+' ... (rastreo + JS + RLS, puede tardar unos segundos)</div>';
+  const q=new URLSearchParams({url,max:$("#max").value,write:$("#write").checked?"1":"0",key:$("#key").value.trim()});
+  try{
+    const r=await fetch("/api/scan?"+q.toString()); const d=await r.json();
+    $("#status").innerHTML=""; render(d);
+  }catch(e){ $("#status").innerHTML='<div class="card err">Error de conexion: '+esc(e)+'</div>'; }
+  $("#go").disabled=false;
+}
+function render(d){
+  if(d.error){$("#out").innerHTML='<div class="card err">'+esc(d.error)+'</div>';return;}
+  const cnt={CRITICO:0,ALTO:0,MEDIO:0,INFO:0}; d.findings.forEach(f=>cnt[f.sev]++);
+  let h="";
+  h+='<div class="card"><h2>Resumen <span class="s">'+esc(d.target)+' · '+d.findings.length+' hallazgo(s)</span></h2>';
+  h+='<div class="sevgrid" style="margin-top:14px">';
+  for(const [k,c] of [["crit",cnt.CRITICO],["alto",cnt.ALTO],["medio",cnt.MEDIO],["info",cnt.INFO]])
+    h+='<div class="tile '+k+'"><div class="n">'+c+'</div><div class="l">'+k+'</div></div>';
+  h+='</div><ul class="find">';
+  const ord={CRITICO:0,ALTO:1,MEDIO:2,INFO:3};
+  d.findings.slice().sort((a,b)=>ord[a.sev]-ord[b.sev]).forEach(f=>{
+    const c=SEV[f.sev]; h+='<li class="'+c+'"><span class="badge '+c+'">'+f.sev+'</span>'+esc(f.txt)+'</li>';});
+  if(!d.findings.length) h+='<li class="info">Sin hallazgos.</li>';
+  h+='</ul></div>';
+  if(d.supabase){
+    h+='<div class="card"><h2>Supabase <span class="s">prueba RLS en vivo</span></h2>';
+    h+='<div class="meta"><div class="k">Proyecto</div><div>'+esc(d.supabase.url)+'</div>';
+    h+='<div class="k">anon key</div><div>'+esc(d.supabase.key||"no detectada")+'</div></div>';
+    if(d.rls.length){
+      h+='<table><tr><th>Tabla</th><th>Lectura</th><th>Escritura</th></tr>';
+      d.rls.forEach(r=>{const lc=r.lectura.includes("ABIERTA")?"ab":"pr",ec=r.escritura.includes("ABIERTA")?"ab":"pr";
+        h+='<tr><td>'+esc(r.tabla)+'</td><td class="'+lc+'">'+esc(r.lectura)+'</td><td class="'+ec+'">'+esc(r.escritura)+'</td></tr>';});
+      h+='</table>';
+    } else h+='<p class="s">No se pudo probar (falta anon key o tablas). Pasala en el campo de arriba.</p>';
+    if(d.sql){ h+='<button id="cp" style="margin-top:14px">Copiar SQL de cierre</button><pre id="sql">'+esc(d.sql)+'</pre>'; }
+    h+='</div>';
+  }
+  if(d.archivos.length){
+    h+='<div class="card"><h2>Archivos sensibles publicos</h2><div class="chips">';
+    d.archivos.forEach(f=>h+='<span class="chip" style="border-color:var(--crit)">/'+esc(f)+'</span>'); h+='</div></div>';
+  }
+  if(d.apis.length||d.hosts.length){
+    h+='<div class="card"><h2>Superficie</h2>';
+    if(d.apis.length)h+='<p class="s" style="margin:8px 0 2px">Endpoints /api</p><div class="chips">'+d.apis.map(a=>'<span class="chip">'+esc(a)+'</span>').join('')+'</div>';
+    if(d.hosts.length)h+='<p class="s" style="margin:12px 0 2px">Hosts</p><div class="chips">'+d.hosts.map(a=>'<span class="chip">'+esc(a)+'</span>').join('')+'</div>';
+    h+='</div>';
+  }
+  if(d.stats)h+='<div class="card"><span class="s">Paginas: '+d.stats.paginas+' · JS: '+d.stats.js+' · tablas: '+d.stats.tablas+' · '+(d.stats.segundos||0)+'s</span></div>';
+  $("#out").innerHTML=h;
+  const cp=$("#cp");
+  if(cp) cp.onclick=()=>{navigator.clipboard.writeText($("#sql").textContent).then(()=>cp.textContent="Copiado ✓").catch(()=>cp.textContent="Copialo a mano")};
+}
+$("#go").onclick=run;
+$("#url").addEventListener("keydown",e=>{if(e.key==="Enter")run()});
+</script></body></html>
